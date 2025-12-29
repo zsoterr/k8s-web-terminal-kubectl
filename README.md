@@ -1,38 +1,110 @@
 # k8s-web-terminal-kubectl
-Kubernetes management from Web Terminal without kubectl
+Kubernetes management from Web Terminal without kubectl. 
+
+## ⚠️ Security warning (read before deploying)
+In this first version, **no authentication is implemented**!
+> This project provides a web terminal that can execute `kubectl` against your cluster API (via RBAC).
+> **Do NOT expose it publicly without at least**: IP allowlisting, TLS, and authentication: this is supported among ALB annotations: e.g. *inbound-cidrs*.
+**Official documentation**: https://kubernetes-sigs.github.io/aws-load-balancer-controller/latest/guide/ingress/annotations/
+Treat this as a “break-glass / limited-access” tool, not a general UI.
 
 ## What this project does
-- 
+- k8s-web-terminal-kubectl is a web-based terminal for Kubernetes operations (kubectl inside the cluster), exposed via AWS ALB Ingress.
+Tested on Amazon EKS 1.33.
 
 ## What is it and why?
+This repository deploys a **lightweight web terminal (ttyd)** into a Kubernetes cluster, so you can **run `kubectl` from your browser** without installing `kubectl` locally and you should configure `kubeconfig`.
+It is **useful when you need** a quick, controlled in-cluster admin terminal (for training, demos, or emergency access), especially in AWS EKS environments where access paths can be restricted.
 
+## Use cases
+- **Training / demo environments**: Provide a temporary browser-based kubectl terminal for students or demo sessions.
+- **Break-glass access**: Emergency access path when your usual workstation/jump host/management tool or VPN path is unavailable (still requires strong controls).
+- **Limited support sessions**: Time-boxed troubleshooting sessions where you want to avoid distributing kubeconfigs.
 
 ## Key features
-- Technologies used: `Kubernetes v1.32 and +`,
-- Architecture: To be determined later.
-- Important files & folders:
-  - 
-  - `README.md` – this file  
+- Technologies used: Tested on EKS 1.33 (should work on 1.32+)
+- Architecture: ALB → Service → ttyd Pod → K8s API
 - License: **MIT License** – see `LICENSE` file in the parent folder
 
-## Security note
-
-## Usage
-1. **Pre-requisites**::
-- **Kubernetes cluster**:
-
-- **Browser**:
-
-- Used **Image**:
-
-2. **Deploy**:
-
-3. **First steps**:
+## Current environment settings
+- **Web Terminal**: By default, the web terminal can exec only into pods in defined namespace, named *web-kubectl* 
+- **RBAC**:
+  Currently, the following permissions are set as default (they can be modified in the manifest file if necessary):
+  **resource**: pod
+  **verbs**: get and list
+  **namespace**: web-kubectl
 
 
-## Note
-- This is the first version (v1), the goal was to have a working "demo" version: very basic, but I think it demonstrates well what it can be used for and how.
-- It runs under AWS EKS 1.32 cluster
+## Quickstart
+### Prerequisites
+- **Kubernetes cluster** (tested on **EKS 1.33**):
+-**AWS Load Balancer Controller** installed and working: If you also use Amazon EKS, don't forget: we use ALB Ingress annotations, so the AWS Load Balancer Controller must be running in the cluster (otherwise Ingress will not receive ALB).
+**Detailed documentation** here: https://docs.aws.amazon.com/eks/latest/userguide/aws-load-balancer-controller.html
+- kubectl access for deploying manifests (from your admin workstation)
+- A browser for accessing the terminal: validated with Chrome (Version 143.0.7499.170 (Official Build), 64-bit), on Windows 10 and 11
+
+**Note**: we use this image with built-in kubectl: *nikstep/kubectl-ttyd:1.0*. Don't forget to always **use the correct kubectl binary**! If necessary, create your own image and use that!
+
+### Deploy
+```bash
+kubectl apply -f manifests/ns.yaml
+kubectl apply -f manifests/role-rolebinding.yaml
+kubectl apply -f manifests/deployment.yaml
+kubectl apply -f manifests/service.yaml
+kubectl apply -f manifests/ingress.yaml
+```
+
+**Get the URLGet the URL**:
+```bash
+kubectl -n web-kubectl get ingress web-kubectl
+```
+Open the ALB hostname in your browser.
+
+**First steps**:
+You should see a terminal prompt in the browser.
+
+Try a read-only command first:
+```bash
+kubectl get pods -n default
+```
+Then an exec test (if RBAC allows it):
+```bash
+kubectl exec -it <pod> -n default -- /bin/sh
+```
+
+## Security model (network boundary + RBAC + audit)
+### Network boundary
+• Traffic enters via 𝗔𝗪𝗦 𝗔𝗟𝗕 𝗜𝗻𝗴𝗿𝗲𝘀𝘀.
+• Without restrictions, this may be reachable from the public internet.
+### RBAC (least privilege)
+• The ServiceAccount used by the web terminal is bound to a 𝗻𝗮𝗺𝗲𝘀𝗽𝗮𝗰𝗲-𝘀𝗰𝗼𝗽𝗲𝗱 𝗥𝗼𝗹𝗲.
+• By default, it can:
+  • get/list pods, and
+  • create on pods/exec
+  • (scope: the target namespace defined by the Role/RoleBinding)
+### Auditability
+• Every kubectl operation results in Kubernetes API calls.
+• For production-grade usage, enable/collect:
+  • Kubernetes audit logs (cluster-side)
+  • ALB access logs / WAF logs (edge-side, if enabled)
+
+
+## Hardening (recommended before real usage)
+Minimum recommended controls:
+### 1. 𝗜𝗣 𝗮𝗹𝗹𝗼𝘄𝗹𝗶𝘀𝘁 𝗮𝘁 𝗔𝗟𝗕 𝗹𝗲𝘃𝗲𝗹
+• Use alb.ingress.kubernetes.io/inbound-cidrs to restrict access to office/VPN CIDRs.
+### 2. 𝗧𝗟𝗦
+• Terminate TLS on the ALB using ACM (alb.ingress.kubernetes.io/certificate-arn) and listen on 443.
+### 3. 𝗔𝘂𝘁𝗵𝗲𝗻𝘁𝗶𝗰𝗮𝘁𝗶𝗼𝗻
+• Put the ALB behind an authentication layer (OIDC/Cognito) or protect it behind a private network/VPN.
+• Consider AWS WAF rules as an additional layer if internet-facing.
+### 4. 𝗥𝘂𝗻 𝗮𝘀 𝗻𝗼𝗻-𝗿𝗼𝗼𝘁 + 𝗱𝗿𝗼𝗽 𝗰𝗮𝗽𝗮𝗯𝗶𝗹𝗶𝘁𝗶𝗲𝘀
+• Prefer *runAsNonRoot: true*, *readOnlyRootFilesystem: true*, drop Linux capabilities, *seccompProfile: RuntimeDefault*.
+• If ttyd requires writable paths, mount a dedicated *emptyDir* (e.g., to **/tmp**) while keeping the root filesystem read-only.
+### 5. 𝗥𝗲𝗱𝘂𝗰𝗲 𝗯𝗹𝗮𝘀𝘁 𝗿𝗮𝗱𝗶𝘂𝘀
+• Keep RBAC namespace-scoped (avoid ClusterRole unless absolutely needed).
+• Consider a dedicated “sandbox” namespace for supported operations.
+
 
 ## Planned changes in the near future:
 - Ingress ALB annotations - Hardening:
@@ -43,8 +115,7 @@ Kubernetes management from Web Terminal without kubectl
   - If multiple namespaces are required: multiple RoleBindings, not ClusterRole (if possible)
   - Customization of the persmissions: pods/exec + appropriate verbs
 - SecurityContext:
-  - use stricter settings, like *runAsNonRoot: false*, *readOnlyRootFilesystem* and drop not necessary capabilities (**CAPS**)
-  - configure Pod Security Standards (Restricted)
+  - use stricter settings, like *runAsNonRoot: true*, *readOnlyRootFilesystem: true* and drop not necessary capabilities (**CAPS**) : configure Pod Security Standards (Restricted)
   - if image can tolerate:
     • *runAsNonRoot: true*
     • *runAsUser: 1000* + *runAsGroup: 1000*
