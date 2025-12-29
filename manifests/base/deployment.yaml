@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-kubectl
+  namespace: web-kubectl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web-kubectl
+  template:
+    metadata:
+      labels:
+        app: web-kubectl
+    spec:
+      serviceAccountName: web-kubectl
+      containers:
+        - name: ttyd
+          image: nikstep/kubectl-ttyd:1.0
+          command: ["ttyd"]
+          args:
+            - "--writable"
+            - "-p"
+            - "7681"
+            - "/bin/sh"
+          ports:
+            - containerPort: 7681
+              name: http
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: false
