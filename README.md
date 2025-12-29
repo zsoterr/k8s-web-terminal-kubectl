@@ -7,6 +7,7 @@ In this first version, **no authentication is implemented**!
 > **Do NOT expose it publicly without at least**: IP allowlisting, TLS, and authentication: this is supported among ALB annotations: e.g. *inbound-cidrs*.
 
 **Official documentation**: https://kubernetes-sigs.github.io/aws-load-balancer-controller/latest/guide/ingress/annotations/
+
 Treat this as a “break-glass / limited-access” tool, not a general UI.
 
 ## What this project does
