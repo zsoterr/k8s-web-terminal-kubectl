@@ -140,10 +140,10 @@ Minimum recommended controls:
 ### 3) 𝗔𝘂𝘁𝗵𝗲𝗻𝘁𝗶𝗰𝗮𝘁𝗶𝗼𝗻 (OIDC/Cognito or private access)
 • Put the ALB behind an authentication layer (OIDC/Cognito) or protect it behind a private network/VPN.  
 • Consider AWS WAF rules as an additional layer if internet-facing.
-### 4. 𝗥𝘂𝗻 𝗮𝘀 𝗻𝗼𝗻-𝗿𝗼𝗼𝘁 and 𝗱𝗿𝗼𝗽 𝗰𝗮𝗽𝗮𝗯𝗶𝗹𝗶𝘁𝗶𝗲𝘀
+### 4) 𝗥𝘂𝗻 𝗮𝘀 𝗻𝗼𝗻-𝗿𝗼𝗼𝘁 and 𝗱𝗿𝗼𝗽 𝗰𝗮𝗽𝗮𝗯𝗶𝗹𝗶𝘁𝗶𝗲𝘀
 • Prefer *runAsNonRoot: true*, *readOnlyRootFilesystem: true*, drop Linux capabilities, *seccompProfile: RuntimeDefault*.  
 • If ttyd requires writable paths, mount a dedicated *emptyDir* (e.g., to **/tmp**) while keeping the root filesystem read-only.
-### 5. 𝗥𝗲𝗱𝘂𝗰𝗲 𝗯𝗹𝗮𝘀𝘁 𝗿𝗮𝗱𝗶𝘂𝘀
+### 5) 𝗥𝗲𝗱𝘂𝗰𝗲 𝗯𝗹𝗮𝘀𝘁 𝗿𝗮𝗱𝗶𝘂𝘀
 • Keep RBAC namespace-scoped (avoid ClusterRole unless absolutely needed).  
 • Consider a dedicated “sandbox” namespace for supported operations.
 <br/><br/>
