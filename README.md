@@ -134,17 +134,19 @@ Minimum recommended controls:
   - If multiple namespaces are required: multiple RoleBindings, not ClusterRole (if possible)
   - Customization of the persmissions: pods/exec + appropriate verbs
 - SecurityContext:
-  - use stricter settings, like *runAsNonRoot: true*, *readOnlyRootFilesystem: true* and drop not necessary capabilities (**CAPS**) : configure Pod Security Standards (Restricted)
-  - if image can tolerate:
-    • *runAsNonRoot: true*
-    • *runAsUser: 1000* + *runAsGroup: 1000*
-    • *readOnlyRootFilesystem: true*
-    • *capabilities.drop: ["ALL"]*
+  - use stricter settings, like *runAsNonRoot: true*, *readOnlyRootFilesystem: true* and drop not necessary capabilities (**CAPS**) : configure Pod Security Standards (Restricted)  
+  - if image can tolerate:  
+    • *runAsNonRoot: true*  
+    • *runAsUser: 1000* + *runAsGroup: 1000*  
+    • *readOnlyRootFilesystem: true*  
+    • *capabilities.drop: ["ALL"]*  
     • *seccompProfile: RuntimeDefault*
-    **Note**: Due to the operation of **ttyd --writable** and shell, writable space may be required. In this case: mount *emptyDir* to **/tmp**, but rootfs can still be read-only.
-    This will be implemented in repo as follows:
-      • *base/* functional (but safer),
-      • *overlays/hardened/* there will be a "restricted" version.
+      
+    **Note**:
+    Due to the operation of **ttyd --writable** and shell, writable space may be required. In this case, the goal: mount as *emptyDir* to **/tmp**, but rootfs can still be read-only.  
+    This will be implemented in repo as follows:  
+      • *base/* functional (but safer),  
+      • *overlays/hardened/* there will be a "restricted" version.  
 - Using Helm for the installation process
 - Creating a version for multiple environments
 - Preparing for the Kustomization version
