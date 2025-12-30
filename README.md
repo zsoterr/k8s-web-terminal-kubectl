@@ -1,5 +1,5 @@
 # k8s-web-terminal-kubectl
-Kubernetes management from Web Terminal without kubectl.  
+Manage Kubernetes from the Web Terminal without a bastion host (jump server) or management tool.  
 <br/><br/>
 
 ## Welcome! This repository contains the following practical example projects
