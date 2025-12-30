@@ -144,12 +144,17 @@ Minimum recommended controls:
 ---------------
 ## Some pictures during operation:
 
-Web Terminal 1:
-<img width="699" height="801" alt="Web Terminal for kubectl 1" src="https://github.com/user-attachments/assets/xxx1" />
+**Web Terminal** for kubectl (inside the container) - **basic commands**:
+<img width="1451" height="230" alt="Web Terminal for kubectl - basic commands 1" src="https://github.com/user-attachments/assets/20df2d19-f2f6-4d15-b748-0911fbca3092" />
+and  
+<img width="1427" height="92" alt="Web Terminal for kubectl - basic commands 2" src="https://github.com/user-attachments/assets/533b80b2-b0fc-4044-9285-0d3ca7ae9640" />
+<br/><br/>
 
-Web Terminal 1:
+**Web Terminal** for kubectl - start a test nginx pod and jump into it using **kubectl exec under RBAC control**:
+<img width="548" height="75" alt="Web Terminal for kubectl - basic commands - start test nginx pod" src="https://github.com/user-attachments/assets/466559aa-4978-4327-b9af-5ff9e8673301" />
+and  
+<img width="553" height="172" alt="Web Terminal for kubectl - basic commands - start jump into pod with kubectl exec" src="https://github.com/user-attachments/assets/2beca1a9-ecbb-4e80-a627-b0fb40537e17" />
 
-<img width="1063" height="801" alt="Web Terminal for kubectl 1" src="https://github.com/user-attachments/assets/xxx2" />
 <br/><br/>
 
 ## Contributions:
