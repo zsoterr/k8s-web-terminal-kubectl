@@ -24,7 +24,7 @@ Tested on Amazon EKS 1.33.
 <br/><br/>
 
 ## What is it and why?
-This repository deploys a **lightweight web terminal (ttyd)** into a Kubernetes cluster, so you can **run manage your Kubernetes cluster from browser** directly, without you should install kubectl locally and configure `kubeconfig`. It is also can be **helpful if no management tool is available** (or accessible/usable), e.g. *Lens* or *Rancher* .     
+This repository deploys a **lightweight web terminal (ttyd)** into a Kubernetes cluster, and you can **manage your Kubernetes cluster from browser** directly, without you should install kubectl locally and configure `kubeconfig`. It is also can be **helpful if no management tool is available** (or accessible/usable), e.g. *Lens* or *Rancher* .     
 It is **useful when you need** a quick, controlled in-cluster admin terminal (for training, demos, or emergency access), especially in AWS EKS environments where access paths can be restricted.
 <br/><br/>
 
@@ -37,11 +37,28 @@ It is **useful when you need** a quick, controlled in-cluster admin terminal (fo
 ## Key features
 - Technologies used: Tested on EKS 1.33 (should work on 1.32+)
 - Architecture:
-> The architecture follows a simple and controlled request flow: **ALB → Service → ttyd Pod → Kubernetes API**.  
-External users connect through an AWS Application Load Balancer (ALB), which exposes the web interface and forwards HTTP/WebSocket traffic to a Kubernetes Service. The Service routes the traffic to a dedicated ttyd Pod running inside the cluster, which provides a browser-based interactive shell. From this shell, all Kubernetes operations are executed using the Pod’s ServiceAccount credentials. Access to cluster resources is strictly enforced by Kubernetes RBAC, ensuring that the shell can only perform explicitly permitted actions against the Kubernetes API.
+> The architecture follows a simple and controlled request flow:  
+Browser  
+  ↓  
+AWS ALB (Ingress)  
+  ↓  
+Service  
+  ↓  
+ttyd Pod → Kubernetes API (RBAC)  
+ 
+External users connect through an AWS Application Load Balancer (ALB), which exposes the web interface and forwards HTTP/WebSocket traffic to a Kubernetes Service. 
+The Service routes the traffic to a dedicated ttyd Pod running inside the cluster, which provides a browser-based interactive shell. From this shell, all Kubernetes operations are executed using the Pod’s ServiceAccount credentials. Access to cluster resources is strictly enforced by Kubernetes RBAC, ensuring that the shell can only perform explicitly permitted actions against the Kubernetes API.
 <img width="353" height="710" alt="Web Terminal for kubectl - ascii diagram" src="https://github.com/user-attachments/assets/c42da1c9-ec7e-4cbb-b7ed-8bbd27ea72a4" />
  
 - License: **MIT License** – see `LICENSE` file in this folder
+- LIMITATIONS:  
+  - No built-in authentication  
+  - Not intended as a general-purpose admin UI  
+- UNINSTALL:  
+```bash  
+kubectl delete -f manifests/  
+```  
+Ezeket ráér később, a repo most is teljes értékű.
 <br/><br/>
 
 ## Current environment settings
@@ -72,7 +89,8 @@ kubectl apply -f manifests/service.yaml
 kubectl apply -f manifests/ingress.yaml
 ```
 
-**Get the URLGet the URL** andopen the ALB hostname in your browser:
+**Get the URLGet the URL**  
+**Open** the ALB hostname in your browser:
 ```bash
 kubectl -n web-kubectl get ingress web-kubectl
 ```
@@ -92,10 +110,10 @@ kubectl exec -it <pod> -n web-kubectl -- /bin/sh
 
 ## Security model (network boundary + RBAC + audit)
 ### Network boundary
-• Traffic enters via 𝗔𝗪𝗦 𝗔𝗟𝗕 𝗜𝗻𝗴𝗿𝗲𝘀𝘀.  
+• Traffic enters via **AWS ALB** (Ingress) and is forwarded to the web-kubectl Service.  
 • Without restrictions, this may be reachable from the public internet.
 ### RBAC (least privilege)
-• The ServiceAccount used by the web terminal is bound to a 𝗻𝗮𝗺𝗲𝘀𝗽𝗮𝗰𝗲-𝘀𝗰𝗼𝗽𝗲𝗱 𝗥𝗼𝗹𝗲.  
+• The ServiceAccount used by the web terminal is bound to a **namespace-scoped Role** and **RoleBinding** (least privilege). 
 • **Scope**: the target namespace defined by the Role/RoleBinding, named *web-kubectl*  
 • **Documentation**: https://kubernetes.io/docs/concepts/security/rbac-good-practices/  
 **By default**, it can:  
@@ -115,11 +133,11 @@ For **production-grade usage**, enable/collect:
 
 ## Hardening (recommended before real usage)
 Minimum recommended controls:
-### 1. 𝗜𝗣 𝗮𝗹𝗹𝗼𝘄𝗹𝗶𝘀𝘁 𝗮𝘁 𝗔𝗟𝗕 𝗹𝗲𝘃𝗲𝗹 (inbound-cidrs)
+### 1) 𝗜𝗣 𝗮𝗹𝗹𝗼𝘄𝗹𝗶𝘀𝘁 𝗮𝘁 𝗔𝗟𝗕 𝗹𝗲𝘃𝗲𝗹 (inbound-cidrs)
 • Use alb.ingress.kubernetes.io/inbound-cidrs to restrict access to office/VPN CIDRs.
-### 2. 𝗧𝗟𝗦
+### 2) 𝗧𝗟𝗦 on ALB (ACM certificate-arn + 443 listener)
 • Terminate TLS on the ALB using ACM (alb.ingress.kubernetes.io/certificate-arn) and listen on 443.
-### 3. 𝗔𝘂𝘁𝗵𝗲𝗻𝘁𝗶𝗰𝗮𝘁𝗶𝗼𝗻
+### 3) 𝗔𝘂𝘁𝗵𝗲𝗻𝘁𝗶𝗰𝗮𝘁𝗶𝗼𝗻 (OIDC/Cognito or private access)
 • Put the ALB behind an authentication layer (OIDC/Cognito) or protect it behind a private network/VPN.  
 • Consider AWS WAF rules as an additional layer if internet-facing.
 ### 4. 𝗥𝘂𝗻 𝗮𝘀 𝗻𝗼𝗻-𝗿𝗼𝗼𝘁 and 𝗱𝗿𝗼𝗽 𝗰𝗮𝗽𝗮𝗯𝗶𝗹𝗶𝘁𝗶𝗲𝘀
@@ -136,7 +154,7 @@ Minimum recommended controls:
   - IP allowlist at ALB level: *alb.ingress.kubernetes.io/inbound-cidrs* (e.g., office/VPN CIDRs), 
   - TLS: ACM certificate + HTTPS listener (later "mandatory" if not on a "trusted" network) under the *overlays/internet-facing*
 - RBAC - Parameterization:
-  - TARGET_NAMESPACE=default by default (Kustomize overlay patch)
+  - set variable: *TARGET_NAMESPACE=$YOUR-NAMESPACE*  by default (Kustomize overlay patch)
   - If multiple namespaces are required: multiple RoleBindings, not ClusterRole (if possible)
   - Customization of the persmissions: pods/exec + appropriate verbs
 - SecurityContext:
