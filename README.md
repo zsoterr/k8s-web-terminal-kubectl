@@ -19,12 +19,12 @@ Treat this as a “break-glass / limited-access” tool, not a general UI.
 <br/><br/>
 
 ## What this project does
-- k8s-web-terminal-kubectl is a web-based terminal for Kubernetes operations (kubectl inside the cluster), exposed via AWS ALB Ingress.
+- k8s-web-terminal-kubectl is a web-based terminal for Kubernetes operations (kubectl inside the container), exposed via AWS ALB Ingress.
 Tested on Amazon EKS 1.33.
 <br/><br/>
 
 ## What is it and why?
-This repository deploys a **lightweight web terminal (ttyd)** into a Kubernetes cluster, so you can **run `kubectl` from your browser** without installing `kubectl` locally and you should configure `kubeconfig`.
+This repository deploys a **lightweight web terminal (ttyd)** into a Kubernetes cluster, so you can **run manage your Kubernetes cluster from browser** directly, without you should install kubectl locally and configure `kubeconfig`. It is also can be **helpful if no management tool is available** (or accessible/usable), e.g. *Lens* or *Rancher* .     
 It is **useful when you need** a quick, controlled in-cluster admin terminal (for training, demos, or emergency access), especially in AWS EKS environments where access paths can be restricted.
 <br/><br/>
 
