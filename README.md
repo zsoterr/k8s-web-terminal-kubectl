@@ -37,7 +37,7 @@ It is **useful when you need** a quick, controlled in-cluster admin terminal (fo
 ## Key features
 - Technologies used: Tested on EKS 1.33 (should work on 1.32+)
 - Architecture:
-> The architecture follows a simple and controlled request flow: **ALB → Service → ttyd Pod → Kubernetes API**.
+> The architecture follows a simple and controlled request flow: **ALB → Service → ttyd Pod → Kubernetes API**.  
 External users connect through an AWS Application Load Balancer (ALB), which exposes the web interface and forwards HTTP/WebSocket traffic to a Kubernetes Service. The Service routes the traffic to a dedicated ttyd Pod running inside the cluster, which provides a browser-based interactive shell. From this shell, all Kubernetes operations are executed using the Pod’s ServiceAccount credentials. Access to cluster resources is strictly enforced by Kubernetes RBAC, ensuring that the shell can only perform explicitly permitted actions against the Kubernetes API.
 <img width="353" height="710" alt="Web Terminal for kubectl - ascii diagram" src="https://github.com/user-attachments/assets/c42da1c9-ec7e-4cbb-b7ed-8bbd27ea72a4" />
  
