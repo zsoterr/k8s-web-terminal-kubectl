@@ -2,6 +2,12 @@
 Kubernetes management from Web Terminal without kubectl.  
 <br/><br/>
 
+## Welcome! This repository contains the following practical example projects
+-------------
+### You are free to use and modify this code, but please keep attribution to the original author (Róbert Zsótér) and link back to this repository where possible. The license applies to the entire repo.
+-------------
+<br/><br/>
+
 ## ⚠️ Security warning (read before deploying)
 In this first version, **no authentication is implemented**!
 > This project provides a web terminal that can execute `kubectl` against your cluster API (via RBAC).
@@ -150,21 +156,30 @@ and
 <img width="1427" height="92" alt="Web Terminal for kubectl - basic commands 2" src="https://github.com/user-attachments/assets/533b80b2-b0fc-4044-9285-0d3ca7ae9640" />
 <br/><br/>
 
-**Web Terminal** for kubectl - start a test nginx pod and jump into it using **kubectl exec under RBAC control**:
-<img width="548" height="75" alt="Web Terminal for kubectl - basic commands - start test nginx pod" src="https://github.com/user-attachments/assets/466559aa-4978-4327-b9af-5ff9e8673301" />
+**Web Terminal** for kubectl - **start a test nginx pod** and **jump into** it using **kubectl exec under RBAC control**:
+<img width="548" height="75" alt="Web Terminal for kubectl - basic commands - start test nginx pod" src="https://github.com/user-attachments/assets/466559aa-4978-4327-b9af-5ff9e8673301" />  
 and  
-<img width="553" height="172" alt="Web Terminal for kubectl - basic commands - start jump into pod with kubectl exec" src="https://github.com/user-attachments/assets/2beca1a9-ecbb-4e80-a627-b0fb40537e17" />
+<img width="563" height="537" alt="Web Terminal for kubectl - basic commands - start jump into pod with kubectl exec -2nd" src="https://github.com/user-attachments/assets/bd0d38e5-f3e5-4612-9c50-22643c1a80cd" />
 
 <br/><br/>
 
-## Contributions:
-This project is provided as-is, primarily for educational and reference purposes. Feel free to fork and adapt it to your own use case. \
-However, I am not currently accepting external pull requests due to limited review time. 
+-----------
+## Resources
+### Related blog posts
+
+- Medium: *Coming soon* – []
+- dev.to: *Coming soon* – []
+- Substack: *Coming soon* – []
+-----------
+
+
+## Contribution Policy
+This repository is maintained as a curated, single-author collection of Kubernetes examples, primarily for educational and reference purposes.  
+Feel free to fork and adapt it to your own use case.  
+However, I am not currently accepting external feature requests, bug reports, or pull requests due to limited review time. 
 <br/><br/>
 
 ## Note:
-**Discussions are open** for ideas, questions, and feedback.  
-However, this project does not accept feature requests, bug reports, or pull requests.  
+**Discussions remain open** for feedback, questions, and ideas..  
 Feel free to share ideas, but there is no guaranteed response time.
-
-
+<br/><br/>
