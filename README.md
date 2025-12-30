@@ -82,7 +82,7 @@ You should see a terminal prompt in the browser.
 
 Try a read-only command first:
 ```bash
-kubectl get pods -n default
+kubectl get pods -n web-kubectl
 ```
 Then an exec test (if RBAC allows it):
 ```bash
@@ -96,27 +96,33 @@ kubectl exec -it <pod> -n web-kubectl -- /bin/sh
 • Without restrictions, this may be reachable from the public internet.
 ### RBAC (least privilege)
 • The ServiceAccount used by the web terminal is bound to a 𝗻𝗮𝗺𝗲𝘀𝗽𝗮𝗰𝗲-𝘀𝗰𝗼𝗽𝗲𝗱 𝗥𝗼𝗹𝗲.  
-• **Scope**: the target namespace defined by the Role/RoleBinding  
+• **Scope**: the target namespace defined by the Role/RoleBinding, named *web-kubectl*  
+• **Documentation**: https://kubernetes.io/docs/concepts/security/rbac-good-practices/  
 **By default**, it can:  
   • get/list pods, and  
-  • create on pods/exec    
+  • create on pods/exec in the defined namespace (*web-kubectl*)
 ### Auditability
 • Every kubectl operation results in Kubernetes API calls.  
 For **production-grade usage**, enable/collect:  
   • Kubernetes audit logs (cluster-side)  
   • ALB access logs / WAF logs (edge-side, if enabled)
+
+ ### Suggested
+  • Threat: unauthenticated network access to terminal  
+  • Impact: Kubernetes API actions under SA RBAC  
+  • Mitigation: inbound-cidrs + TLS + auth (OIDC/Cognito) + WAF + audit  
 <br/><br/>
 
 ## Hardening (recommended before real usage)
 Minimum recommended controls:
-### 1. 𝗜𝗣 𝗮𝗹𝗹𝗼𝘄𝗹𝗶𝘀𝘁 𝗮𝘁 𝗔𝗟𝗕 𝗹𝗲𝘃𝗲𝗹
+### 1. 𝗜𝗣 𝗮𝗹𝗹𝗼𝘄𝗹𝗶𝘀𝘁 𝗮𝘁 𝗔𝗟𝗕 𝗹𝗲𝘃𝗲𝗹 (inbound-cidrs)
 • Use alb.ingress.kubernetes.io/inbound-cidrs to restrict access to office/VPN CIDRs.
 ### 2. 𝗧𝗟𝗦
 • Terminate TLS on the ALB using ACM (alb.ingress.kubernetes.io/certificate-arn) and listen on 443.
 ### 3. 𝗔𝘂𝘁𝗵𝗲𝗻𝘁𝗶𝗰𝗮𝘁𝗶𝗼𝗻
 • Put the ALB behind an authentication layer (OIDC/Cognito) or protect it behind a private network/VPN.  
 • Consider AWS WAF rules as an additional layer if internet-facing.
-### 4. 𝗥𝘂𝗻 𝗮𝘀 𝗻𝗼𝗻-𝗿𝗼𝗼𝘁 + 𝗱𝗿𝗼𝗽 𝗰𝗮𝗽𝗮𝗯𝗶𝗹𝗶𝘁𝗶𝗲𝘀
+### 4. 𝗥𝘂𝗻 𝗮𝘀 𝗻𝗼𝗻-𝗿𝗼𝗼𝘁 and 𝗱𝗿𝗼𝗽 𝗰𝗮𝗽𝗮𝗯𝗶𝗹𝗶𝘁𝗶𝗲𝘀
 • Prefer *runAsNonRoot: true*, *readOnlyRootFilesystem: true*, drop Linux capabilities, *seccompProfile: RuntimeDefault*.  
 • If ttyd requires writable paths, mount a dedicated *emptyDir* (e.g., to **/tmp**) while keeping the root filesystem read-only.
 ### 5. 𝗥𝗲𝗱𝘂𝗰𝗲 𝗯𝗹𝗮𝘀𝘁 𝗿𝗮𝗱𝗶𝘂𝘀
