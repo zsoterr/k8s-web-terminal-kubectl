@@ -48,6 +48,8 @@ ttyd Pod → Kubernetes API (RBAC)
  
 External users connect through an AWS Application Load Balancer (ALB), which exposes the web interface and forwards HTTP/WebSocket traffic to a Kubernetes Service. 
 The Service routes the traffic to a dedicated ttyd Pod running inside the cluster, which provides a browser-based interactive shell. From this shell, all Kubernetes operations are executed using the Pod’s ServiceAccount credentials. Access to cluster resources is strictly enforced by Kubernetes RBAC, ensuring that the shell can only perform explicitly permitted actions against the Kubernetes API.
+
+**Detailed diagram**:  
 <img width="353" height="710" alt="Web Terminal for kubectl - ascii diagram" src="https://github.com/user-attachments/assets/c42da1c9-ec7e-4cbb-b7ed-8bbd27ea72a4" />
  
 - License: **MIT License** – see `LICENSE` file in this folder
@@ -58,7 +60,6 @@ The Service routes the traffic to a dedicated ttyd Pod running inside the cluste
 ```bash  
 kubectl delete -f manifests/  
 ```  
-Ezeket ráér később, a repo most is teljes értékű.
 <br/><br/>
 
 ## Current environment settings
@@ -181,15 +182,15 @@ Minimum recommended controls:
 ## Some pictures during operation:
 
 **Web Terminal** for kubectl (inside the container) - **basic commands**:
+<img width="1456" height="496" alt="Web Terminal for kubectl commands" src="https://github.com/user-attachments/assets/db91db78-9d33-48bb-8f1c-c4de2dd77e51" />
+
 <img width="1451" height="230" alt="Web Terminal for kubectl - basic commands 1" src="https://github.com/user-attachments/assets/20df2d19-f2f6-4d15-b748-0911fbca3092" />
 and  
 <img width="1427" height="92" alt="Web Terminal for kubectl - basic commands 2" src="https://github.com/user-attachments/assets/533b80b2-b0fc-4044-9285-0d3ca7ae9640" />
 <br/><br/>
 
 **Web Terminal** for kubectl - **start a test nginx pod** and **jump into** it using **kubectl exec under RBAC control**:
-<img width="548" height="75" alt="Web Terminal for kubectl - basic commands - start test nginx pod" src="https://github.com/user-attachments/assets/466559aa-4978-4327-b9af-5ff9e8673301" />  
-and  
-<img width="563" height="537" alt="Web Terminal for kubectl - basic commands - start jump into pod with kubectl exec -2nd" src="https://github.com/user-attachments/assets/bd0d38e5-f3e5-4612-9c50-22643c1a80cd" />
+<img width="806" height="670" alt="Web Terminal for kubectl exec command" src="https://github.com/user-attachments/assets/4f327f70-4a4b-4487-86ca-c78a9841bd85" />
 
 <br/><br/>
 
@@ -197,9 +198,12 @@ and
 ## Resources
 ### Related blog posts
 
-- Medium: *Coming soon* – []
-- dev.to: *Coming soon* – []
-- Substack: *Coming soon* – []
+- Medium:  
+ *Browser-Based kubectl Access: Managing Kubernetes Without Bastion Hosts or Heavy Tools* – [https://medium.com/@zs77.robert/browser-based-kubectl-access-managing-kubernetes-without-bastion-hosts-or-heavy-tools-1b6c939ce8ee]
+- dev.to:  
+ *Browser-Based kubectl Access: Managing Kubernetes Without Bastion Hosts* – [https://dev.to/robert_r_7c237256b7614328/browser-based-kubectl-access-managing-kubernetes-without-bastion-hosts-1b4a]
+- Substack:  
+  *Browser-based kubectl access* – [https://cloudskillshu.substack.com/p/browser-based-kubectl-access-without-bastion-hosts]
 -----------
 
 
